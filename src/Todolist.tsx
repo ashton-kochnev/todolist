@@ -4,17 +4,23 @@ import {FilterValueType, TaskType} from "./App";
 type TodolistPropsType = {
     title: string
     tasks: Array<TaskType>
+    filter: FilterValueType
     addTask: (title: string) => void
     removeTask: (task: string) => void
     changeFilter: (value: FilterValueType) => void
+    changeTaskStatus : (taskId: string, newIsDoneValue: boolean) => void
 }
 
 function Todolist(props: TodolistPropsType) {
-    const [title, setTitle] = useState('')
+    const [title, setTitle] = useState<string>('')
+    const [error, setError] = useState<boolean>(true)
     const tasksJSXElements = props.tasks.map(t => {
         return (
-            <li>
-                <input type="checkbox" checked={t.isDone}/>
+            <li className={t.isDone ? 'isDone' : ''}>
+                <input
+                    onChange={(e) => props.changeTaskStatus(t.id, e.currentTarget.checked)}
+                    type="checkbox"
+                    checked={t.isDone}/>
                 <span>{t.title}</span>
                 <button onClick={() => {
                     props.removeTask(t.id)
@@ -25,7 +31,11 @@ function Todolist(props: TodolistPropsType) {
     })
 
     const addTask = () => {
-        props.addTask(title)
+        if (title.trim()) {
+            props.addTask(title.trim())
+        } else {
+            setError(false)
+        }
         setTitle('')
     }
 
@@ -35,7 +45,10 @@ function Todolist(props: TodolistPropsType) {
         }
     }
 
-    const onChangeTitle = (e: ChangeEvent<HTMLInputElement>) => setTitle(e.currentTarget.value)
+    const onChangeTitle = (e: ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.currentTarget.value)
+        setError(false)
+    }
 
     const onClickAllFilter = () => props.changeFilter('all')
     const onClickActiveFilter = () => props.changeFilter('active')
@@ -45,7 +58,7 @@ function Todolist(props: TodolistPropsType) {
         <div>
             <h3>{props.title}</h3>
             <div>
-                <input
+                <input className={error ? 'error' : ''}
                     value={title}
                     onChange={onChangeTitle}
                     onKeyPress={onKeyPressAddTask}
@@ -54,9 +67,18 @@ function Todolist(props: TodolistPropsType) {
             </div>
             <ul>{tasksJSXElements}</ul>
             <div>
-                <button onClick={onClickAllFilter}>All</button>
-                <button onClick={onClickActiveFilter}>Active</button>
-                <button onClick={onClickCompletedFilter}>Completed</button>
+                <button
+                    className={props.filter === 'all' ? 'active-filter' : ''}
+                    onClick={onClickAllFilter}>All
+                </button>
+                <button
+                    className={props.filter === 'active' ? 'active-filter' : ''}
+                    onClick={onClickActiveFilter}>Active
+                </button>
+                <button
+                    className={props.filter === 'completed' ? 'active-filter' : ''}
+                    onClick={onClickCompletedFilter}>Completed
+                </button>
             </div>
         </div>
     )
