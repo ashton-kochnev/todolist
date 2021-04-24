@@ -9,7 +9,7 @@ export type TaskType = {
     isDone: boolean
 }
 
-export type FilterValueType = "all" | 'completed'| 'active'
+export type FilterValueType = "all" | 'completed' | 'active'
 
 function App() {
     const [tasks, setTasks] = useState<Array<TaskType>>(
@@ -37,7 +37,7 @@ function App() {
         setTasks([newTask, ...tasks])
     }
 
-    function changeTaskStatus (taskId: string, newIsDoneValue: boolean) {
+    function changeTaskStatus(taskId: string, newIsDoneValue: boolean) {
         setTasks(tasks.map(t => t.id === taskId ? {...t, isDone: newIsDoneValue} : t))
     }
 
@@ -46,11 +46,11 @@ function App() {
     }
 
     let tasksForTodolist = tasks;
-    if(filter === 'completed') {
-        tasksForTodolist = tasks.filter(t => t.isDone === true)
+    if (filter === 'completed') {
+        tasksForTodolist = tasks.filter(t => t.isDone)
     }
-    if(filter === 'active') {
-        tasksForTodolist = tasks.filter(t => t.isDone === false)
+    if (filter === 'active') {
+        tasksForTodolist = tasks.filter(t => !t.isDone)
     }
 
     return (
