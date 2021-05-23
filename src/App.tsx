@@ -53,26 +53,33 @@ function App() {
 
     function addTask(title: string, todolistId: string) {
         const newTask: TaskType = {id: v1(), title: title, isDone: false}
-        setTasks({...tasks, [todolistId]: [newTask, ...tasks[todolistId]]})
+        tasks[todolistId] = [newTask, ...tasks[todolistId]]
+        setTasks({...tasks})
+        // setTasks({...tasks, [todolistId]: [newTask, ...tasks[todolistId]]})
     }
 
     function changeTaskStatus(taskId: string, isDone: boolean, todolistId: string) {
-        setTasks({...tasks, [todolistId]: tasks[todolistId].map(t => t.id === taskId ? {...t, isDone: isDone} : t)})
-        // let tasks = tasks[todolistId]
-        // let task = tasks.find(t => t.id === taskId);
-        // if (task) {
-        //     task.isDone = isDone
-        //     setTasks({...tasks})
-        // }
+        // setTasks({...tasks, [todolistId]: tasks[todolistId].map(t => t.id === taskId ? {...t, isDone: isDone} : t)})
+        let task = tasks[todolistId].find(t => t.id === taskId);
+        if (task) {
+            task.isDone = isDone
+            setTasks({...tasks})
+        }
     }
 
     function changeFilter(value: FilterValueType, todolistId: string) {
-        setTodolists(todoLists.map(t => t.id === todolistId ? {...t, filter: value} : t))
-        // let todolist = todoLists.find(tl => tl.id === todolistId)
-        // if (todolist) {
-        //     todolist.filter = value
-        //     setTodolists([...todoLists])
-        // }
+        // setTodolists(todoLists.map(t => t.id === todolistId ? {...t, filter: value} : t))
+        let todolist = todoLists.find(tl => tl.id === todolistId)
+        if (todolist) {
+            todolist.filter = value
+            setTodolists([...todoLists])
+        }
+    }
+
+    function removeTodolist(todolistId: string) {
+        setTodolists(todoLists.filter(tl => tl.id !== todolistId))
+        delete tasks[todolistId]
+        setTasks({...tasks})
     }
 
     return (
@@ -94,6 +101,7 @@ function App() {
                         title={tl.title}
                         tasks={tasksForTodolist}
                         filter={tl.filter}
+                        removeTodolist={removeTodolist}
                         removeTask={removeTask}
                         changeFilter={changeFilter}
                         addTask={addTask}
