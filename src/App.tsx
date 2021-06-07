@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import './App.css';
 import Todolist from "./Todolist";
 import {v1} from "uuid";
+import {AddItemForm} from "./AddItemForm";
 
 export type TaskType = {
     id: string
@@ -25,7 +26,7 @@ function App() {
     let todolistId1 = v1()
     let todolistId2 = v1()
 
-    let [todoLists, setTodolists] = useState<TodolistType[]>([
+    let [todolists, setTodolists] = useState<TodolistType[]>([
             {id: todolistId1, title: 'What to learn', filter: 'all'},
             {id: todolistId2, title: 'What to buy', filter: 'all'}
         ]
@@ -55,11 +56,9 @@ function App() {
         const newTask: TaskType = {id: v1(), title: title, isDone: false}
         tasks[todolistId] = [newTask, ...tasks[todolistId]]
         setTasks({...tasks})
-        // setTasks({...tasks, [todolistId]: [newTask, ...tasks[todolistId]]})
     }
 
     function changeTaskStatus(taskId: string, isDone: boolean, todolistId: string) {
-        // setTasks({...tasks, [todolistId]: tasks[todolistId].map(t => t.id === taskId ? {...t, isDone: isDone} : t)})
         let task = tasks[todolistId].find(t => t.id === taskId);
         if (task) {
             task.isDone = isDone
@@ -68,24 +67,37 @@ function App() {
     }
 
     function changeFilter(value: FilterValueType, todolistId: string) {
-        // setTodolists(todoLists.map(t => t.id === todolistId ? {...t, filter: value} : t))
-        let todolist = todoLists.find(tl => tl.id === todolistId)
+        let todolist = todolists.find(tl => tl.id === todolistId)
         if (todolist) {
             todolist.filter = value
-            setTodolists([...todoLists])
+            setTodolists([...todolists])
         }
     }
 
     function removeTodolist(todolistId: string) {
-        setTodolists(todoLists.filter(tl => tl.id !== todolistId))
+        setTodolists(todolists.filter(tl => tl.id !== todolistId))
         delete tasks[todolistId]
         setTasks({...tasks})
     }
 
+    function addTodolist(title: string) {
+        let todolist: TodolistType = {
+            id: v1(),
+            title: title,
+            filter: 'all'
+        }
+        setTodolists([todolist, ...todolists])
+        setTasks({
+            ...tasks,
+            [todolist.id]: []
+        })
+    }
+
     return (
         <div className="App">
+            <AddItemForm addItem={addTodolist}/>
             {
-                todoLists.map(tl => {
+                todolists.map(tl => {
                     let tasksForTodolist = tasks[tl.id];
 
                     if (tl.filter === 'completed') {
@@ -94,7 +106,6 @@ function App() {
                     if (tl.filter === 'active') {
                         tasksForTodolist = tasksForTodolist.filter(t => !t.isDone)
                     }
-
                     return <Todolist
                         key={tl.id}
                         id={tl.id}
